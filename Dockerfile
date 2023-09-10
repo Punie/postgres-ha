@@ -1,4 +1,4 @@
-ARG PG_VERSION=14.4
+ARG PG_VERSION=14.9
 ARG VERSION=custom
 
 FROM golang:1.16 as flyutil
@@ -26,6 +26,7 @@ FROM postgres:${PG_VERSION}
 ARG VERSION 
 ARG POSTGIS_MAJOR=3
 ARG WALG_VERSION=2.0.0
+ARG PGX_ULID_VERSION=0.1.2
 
 LABEL fly.app_role=postgres_cluster
 LABEL fly.version=${VERSION}
@@ -33,6 +34,7 @@ LABEL fly.pg-version=${PG_VERSION}
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     ca-certificates curl bash dnsutils vim-tiny procps jq haproxy \
+    apt-utils build-essential libc6 \
     && apt autoremove -y
 
 RUN echo "deb https://packagecloud.io/timescale/timescaledb/debian/ $(cat /etc/os-release | grep VERSION_CODENAME | cut -d'=' -f2) main" > /etc/apt/sources.list.d/timescaledb.list \
@@ -46,6 +48,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && echo 'Installing wal-g' \
     && curl -L https://github.com/wal-g/wal-g/releases/download/v${WALG_VERSION}/wal-g-pg-ubuntu-18.04-amd64 > /usr/local/bin/wal-g \
     && chmod +x /usr/local/bin/wal-g
+
+RUN curl -L -o pgx_ulid.deb "https://github.com/pksunkara/pgx_ulid/releases/download/v${PGX_ULID_VERSION}/pgx_ulid-v${PGX_ULID_VERSION}-pg${PG_MAJOR}-amd64-linux-gnu.deb" && \
+    apt install -y ./pgx_ulid.deb
 
 COPY --from=stolon /go/src/app/bin/* /usr/local/bin/
 COPY --from=postgres_exporter /postgres_exporter /usr/local/bin/

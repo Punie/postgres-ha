@@ -39,8 +39,10 @@ func InitConfig(filename string) (*Config, error) {
 		log.Fatalln("error cleaning filename", err)
 	}
 
-	// Detect if TimescaleDB is installed.
 	preloadShared := []string{}
+	preloadShared = append(preloadShared, "ulid")
+
+	// Detect if TimescaleDB is installed.
 	tsEnabled, err := strconv.ParseBool(os.Getenv("TIMESCALEDB_ENABLED"))
 	if err == nil && tsEnabled {
 		preloadShared = append(preloadShared, "timescaledb")

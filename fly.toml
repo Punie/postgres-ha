@@ -1,4 +1,10 @@
-app = "postgres-ha-example"
+# fly.toml app configuration file generated for sibook-db on 2023-09-04T15:52:54+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "sibook-db"
+primary_region = "cdg"
 
 kill_signal = "SIGTERM"
 kill_timeout = 300
@@ -32,6 +38,8 @@ services = []
     port = 5500
     timeout = "10s"
     type = "http"
+
+[build]
 
 [env]
   BACKEND_STORE = "consul"
